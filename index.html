@@ -5,6 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Meld — 3D modeling on iPad</title>
 <meta name="description" content="Meld is a polygon modeling and texture painting app built for iPad.">
+
+<!-- Link previews. Put a 1200x630 image at /og.png — this is what shows when
+     someone shares the link on Discord, iMessage or X. -->
+<meta property="og:title" content="Meld — 3D modeling on iPad">
+<meta property="og:description" content="A polygon modeler and texture painter built for touch.">
+<meta property="og:image" content="https://meld3d.app/og.png">
+<meta property="og:url" content="https://meld3d.app">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
 <style>
   :root {
     --bg: #0d0d10;
@@ -22,9 +34,22 @@
     -webkit-font-smoothing: antialiased;
   }
   .wrap { max-width: 940px; margin: 0 auto; padding: 0 24px; }
-
   header { padding: 28px 0; border-bottom: 1px solid var(--line); }
-  .logo { font-weight: 650; font-size: 19px; letter-spacing: -0.02em; }
+
+  /* Logo mark and wordmark side by side. */
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 650;
+    font-size: 19px;
+    letter-spacing: -0.02em;
+  }
+  .logo-mark {
+    width: 26px;
+    height: 26px;
+    display: block;
+  }
 
   .hero { padding: 96px 0 72px; text-align: center; }
   .hero h1 {
@@ -64,7 +89,27 @@
     font-size: 14px;
     overflow: hidden;
   }
-  .shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  /* CONTAIN, not cover, for app screenshots.
+     cover crops to fill, which cuts the UI off at the edges — fine for a photo,
+     wrong for a screenshot where the toolbars are the point. */
+  .shot img { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+  /* Secondary screenshots. Two or three across, smaller than the hero shot. */
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+  }
+  .gallery figure { margin: 0; }
+  .gallery .shot { aspect-ratio: 4 / 3; border-radius: 10px; }
+  .gallery figcaption {
+    color: var(--muted);
+    font-size: 13px;
+    text-align: left;
+    margin-top: 8px;
+  }
 
   .features {
     display: grid;
@@ -95,23 +140,45 @@
 </style>
 </head>
 <body>
-
 <header>
-  <div class="wrap logo">Meld</div>
+  <div class="wrap logo">
+    <img src="/MeldLogo.svg" alt="" class="logo-mark">
+    <span>Meld</span>
+  </div>
 </header>
 
 <main class="wrap">
-
   <section class="hero">
-    <div class="badge">Coming to iPad</div>
+    <div class="badge">Coming to iPad · August 28</div>
     <h1>3D modeling, on your iPad.</h1>
     <p>
       A polygon modeler and texture painter built for touch. Extrude, bevel,
       loop cut, unwrap, and paint — without a desktop.
     </p>
+
     <div class="shot">
-      <!-- Replace with: <img src="screenshot.png" alt="Meld on iPad"> -->
-      screenshot goes here
+      <img src="/shots/viewport.png" alt="A model being edited in Meld on iPad">
+    </div>
+
+    <div class="gallery">
+      <figure>
+        <div class="shot">
+          <img src="/shots/painting.png" alt="Painting colour onto a model with Apple Pencil">
+        </div>
+        <figcaption>Painting with pressure and tilt</figcaption>
+      </figure>
+      <figure>
+        <div class="shot">
+          <img src="/shots/bevel.png" alt="Beveling an edge loop">
+        </div>
+        <figcaption>Bevel, with adjustable shape and segments</figcaption>
+      </figure>
+      <figure>
+        <div class="shot">
+          <img src="/shots/export.png" alt="Exporting a model to USDZ">
+        </div>
+        <figcaption>Export without losing your topology</figcaption>
+      </figure>
     </div>
   </section>
 
@@ -126,25 +193,27 @@
     <div class="feature">
       <h3>Paint in 3D</h3>
       <p>
-        Unwrap UVs and paint colour, roughness, and metallic directly onto
-        your model with Apple Pencil.
+        Paint colour directly onto your model with Apple Pencil, using
+        pressure and tilt. Roughness, metallic and emissive on the paid tier.
       </p>
     </div>
     <div class="feature">
       <h3>Take it anywhere</h3>
       <p>
-        Import and export OBJ and glTF, so Meld fits into the pipeline you
-        already have.
+        Export to OBJ, glTF, GLB and USDZ — the last of which keeps your quads
+        and your materials together, so the next tool gets what you made.
       </p>
     </div>
   </section>
-
 </main>
 
 <footer class="wrap">
   <div>© 2026 Meld Systems LLC</div>
-  <div><a href="mailto:admin@meld3d.app">admin@meld3d.app</a></div>
+  <div>
+    <a href="/privacy.html">Privacy</a> ·
+    <a href="/terms.html">Terms</a> ·
+    <a href="mailto:admin@meld3d.app">support@meld3d.app</a>
+  </div>
 </footer>
-
 </body>
 </html>
