@@ -96,6 +96,13 @@
   .shot img,
   .shot video { width: 100%; height: 100%; object-fit: contain; display: block; }
 
+  /* The hero render is 4:3, and the default 16/10 frame would letterbox it
+     with two bands of panel colour. Matching the frame to the image lets the
+     render fill it edge to edge, and `cover` then guards against a future
+     shot whose aspect is slightly off rather than letterboxing that too. */
+  .shot-hero { aspect-ratio: 4 / 3; }
+  .shot-hero img { object-fit: cover; }
+
   /* Secondary screenshots, as a carousel.
      Scroll snap rather than a JS slider: the track is a real scrollable
      element, so a trackpad swipe or a touch drag moves it natively and the
@@ -289,8 +296,10 @@
       loop cut, unwrap, and paint on the go.
     </p>
 
-    <div class="shot">
-      <img src="/shots/viewport.png" alt="A model being edited in Meld on iPad">
+    <div class="shot shot-hero">
+      <img src="/shots/Meld-2026-08-25-063621.png"
+           alt="A city street corner modeled and rendered in Meld"
+           width="2048" height="1536" fetchpriority="high" decoding="async">
     </div>
 
     <div class="carousel">
@@ -327,13 +336,17 @@
       </figure>
       <figure>
         <div class="shot">
-          <img src="/shots/lighting.png" alt="A scene lit and framed through a camera in Meld">
+          <img src="/shots/Meld-2026-08-25-063104.png"
+               alt="A street corner scene lit by a streetlamp and rendered in Meld"
+               width="2048" height="1536" loading="lazy" decoding="async">
         </div>
         <figcaption>Light your scene, frame it with a camera, and render</figcaption>
       </figure>
       <figure>
         <div class="shot">
-          <img src="/shots/browser.png" alt="The Meld file browser showing 3D previews of saved scenes">
+          <img src="/shots/file-browser.png"
+               alt="The Meld file browser showing 3D previews of saved scenes"
+               loading="lazy" decoding="async">
         </div>
         <figcaption>Every scene you save, previewed in 3D</figcaption>
       </figure>
@@ -366,7 +379,7 @@
     <div class="feature">
       <h3>Take it anywhere</h3>
       <p>
-        Export to OBJ, glTF, GLB and USD. Meld seamlessly fits into your workflow.
+        Export to OBJ, glTF, GLB and USDZ. Meld seamlessly fits into your workflow.
       </p>
     </div>
   </section>
