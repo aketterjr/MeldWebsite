@@ -6,7 +6,7 @@
 <title>Meld — 3D modeling on iPad</title>
 <meta name="description" content="Meld is a polygon modeling and texture painting app built for iPad.">
 
-<!-- Link previews. Put a 1200x630 image at /og.png — this is what shows when
+<!-- Link previews. Put a 1200x630 image at /og.png. This is what shows when
      someone shares the link on Discord, iMessage or X. -->
 <meta property="og:title" content="Meld — 3D modeling on iPad">
 <meta property="og:description" content="A polygon modeler and texture painter built for touch.">
@@ -91,24 +91,76 @@
   }
 
   /* CONTAIN, not cover, for app screenshots.
-     cover crops to fill, which cuts the UI off at the edges — fine for a photo,
+     cover crops to fill, which cuts the UI off at the edges. Fine for a photo,
      wrong for a screenshot where the toolbars are the point. */
-  .shot img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .shot img,
+  .shot video { width: 100%; height: 100%; object-fit: contain; display: block; }
 
-  /* Secondary screenshots. Two or three across, smaller than the hero shot. */
+  /* Secondary screenshots, as a carousel.
+     Scroll snap rather than a JS slider: the track is a real scrollable
+     element, so a trackpad swipe or a touch drag moves it natively and the
+     arrows only need to nudge scrollLeft. Nothing breaks if the script fails. */
+  .carousel { position: relative; margin-top: 16px; }
+
   .gallery {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    display: flex;
     gap: 16px;
-    margin-top: 16px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    /* Room for the focus ring and any shadow, clipped back by the negative
+       margin so the track still lines up with the hero shot above. */
+    padding: 4px 4px 8px;
+    margin: -4px -4px 0;
+    scrollbar-width: none;
   }
-  .gallery figure { margin: 0; }
+  .gallery::-webkit-scrollbar { display: none; }
+
+  .gallery figure {
+    margin: 0;
+    flex: 0 0 calc((100% - 16px) / 2);
+    scroll-snap-align: start;
+  }
   .gallery .shot { aspect-ratio: 4 / 3; border-radius: 10px; }
   .gallery figcaption {
     color: var(--muted);
     font-size: 13px;
     text-align: left;
     margin-top: 8px;
+  }
+
+  /* One at a time once two would be too narrow to read. */
+  @media (max-width: 700px) {
+    .gallery figure { flex: 0 0 100%; }
+  }
+
+  .car-btn {
+    position: absolute;
+    top: calc(50% - 26px);
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--line);
+    background: rgba(22, 22, 27, 0.92);
+    backdrop-filter: blur(6px);
+    border-radius: 999px;
+    color: var(--text);
+    cursor: pointer;
+    padding: 0;
+    z-index: 5;
+    transition: background 0.12s ease, opacity 0.12s ease;
+  }
+  .car-btn:hover { background: #1d1d24; }
+  .car-btn[disabled] { opacity: 0.25; cursor: default; }
+  .car-prev { left: -8px; }
+  .car-next { right: -8px; }
+
+  /* On touch the buttons are redundant and sit on top of the image. */
+  @media (hover: none) {
+    .car-btn { display: none; }
   }
 
   .features {
@@ -137,13 +189,94 @@
   }
   a { color: var(--accent); text-decoration: none; }
   a:hover { text-decoration: underline; }
+
+
+  /* The logo is an anchor on subpages and a div on the index. Without this the
+     global link colour turns the wordmark blue and underlines it on hover. */
+  a.logo, a.logo:hover { color: var(--text); text-decoration: none; }
+
+  /* ---- Header nav ---- */
+  .nav { display: flex; align-items: center; gap: 14px; }
+
+  /* The positioning context for the pop-out. On .nav it would anchor to the
+     centred 940px wrapper instead of to the button. */
+  .menu-wrap { position: relative; }
+
+  .menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    border-radius: 10px;
+    color: var(--text);
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.12s ease;
+  }
+  .menu-btn:hover { background: #1d1d24; }
+  .menu-btn svg { display: block; }
+
+  .menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0;
+    min-width: 190px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 6px;
+    z-index: 40;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  }
+  .menu a {
+    display: block;
+    padding: 10px 13px;
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 15px;
+  }
+  .menu a:hover { background: rgba(255, 255, 255, 0.06); text-decoration: none; }
+
+  /* The page you are already on, so the menu says where you are as well as
+     where you can go. */
+  .menu a[aria-current="page"] { color: var(--accent); }
+
+  /* Wider than the tap target looks, because 38px is under the 44px minimum
+     for touch and the header is the first thing a phone user reaches for. */
+  @media (hover: none) {
+    .menu-btn { width: 44px; height: 44px; }
+  }
 </style>
 </head>
 <body>
 <header>
-  <div class="wrap logo">
-    <img src="/MeldLogo.svg" alt="" class="logo-mark">
-    <span>Meld</span>
+  <div class="wrap nav">
+    <div class="menu-wrap">
+      <button class="menu-btn" id="menuBtn" aria-label="Menu"
+              aria-expanded="false" aria-controls="menu" aria-haspopup="true">
+        <svg width="18" height="14" viewBox="0 0 18 14" fill="none"
+             xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M1 1h16M1 7h16M1 13h16" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <nav class="menu" id="menu" hidden>
+        <a href="/" aria-current="page">Home</a>
+        <a href="/about.html">About</a>
+        <a href="/contact.html">Contact</a>
+        <a href="/terms.html">Terms</a>
+        <a href="/privacy.html">Privacy</a>
+      </nav>
+    </div>
+
+    <div class="logo">
+      <img src="/MeldLogo.svg" alt="" class="logo-mark">
+      <span>Meld</span>
+    </div>
   </div>
 </header>
 
@@ -153,32 +286,65 @@
     <h1>3D modeling, on your iPad.</h1>
     <p>
       A polygon modeler and texture painter built for touch. Extrude, bevel,
-      loop cut, unwrap, and paint — without a desktop.
+      loop cut, unwrap, and paint on the go.
     </p>
 
     <div class="shot">
       <img src="/shots/viewport.png" alt="A model being edited in Meld on iPad">
     </div>
 
-    <div class="gallery">
+    <div class="carousel">
+      <button class="car-btn car-prev" id="carPrev" aria-label="Previous">
+        <svg width="9" height="15" viewBox="0 0 9 15" fill="none" aria-hidden="true">
+          <path d="M8 1L1.5 7.5L8 14" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <div class="gallery" id="gallery">
       <figure>
         <div class="shot">
-          <img src="/shots/painting.png" alt="Painting colour onto a model with Apple Pencil">
+          <video src="/shots/paint.mp4"
+                 poster="/shots/paint.jpg"
+                 autoplay muted loop playsinline
+                 preload="metadata"
+                 aria-label="Painting colour onto a model with Apple Pencil in Meld"></video>
         </div>
-        <figcaption>Painting with pressure and tilt</figcaption>
+        <figcaption>Painting with pen pressure</figcaption>
       </figure>
       <figure>
         <div class="shot">
-          <img src="/shots/bevel.png" alt="Beveling an edge loop">
+          <!-- muted is required or the browser blocks autoplay. playsinline
+               stops iOS taking it fullscreen, which would be a poor look on the
+               device the app runs on. poster fills the slot while it loads. -->
+          <video src="/shots/bevel.mp4"
+                 poster="/shots/bevel.jpg"
+                 autoplay muted loop playsinline
+                 preload="metadata"
+                 aria-label="Beveling the edges of a mailbox in Meld"></video>
         </div>
         <figcaption>Bevel, with adjustable shape and segments</figcaption>
       </figure>
       <figure>
         <div class="shot">
-          <img src="/shots/export.png" alt="Exporting a model to USDZ">
+          <img src="/shots/lighting.png" alt="A scene lit and framed through a camera in Meld">
         </div>
-        <figcaption>Export without losing your topology</figcaption>
+        <figcaption>Light your scene, frame it with a camera, and render</figcaption>
       </figure>
+      <figure>
+        <div class="shot">
+          <img src="/shots/browser.png" alt="The Meld file browser showing 3D previews of saved scenes">
+        </div>
+        <figcaption>Every scene you save, previewed in 3D</figcaption>
+      </figure>
+      </div>
+
+      <button class="car-btn car-next" id="carNext" aria-label="Next">
+        <svg width="9" height="15" viewBox="0 0 9 15" fill="none" aria-hidden="true">
+          <path d="M1 1L7.5 7.5L1 14" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
     </div>
   </section>
 
@@ -186,22 +352,21 @@
     <div class="feature">
       <h3>Real modeling tools</h3>
       <p>
-        Extrude, inset, bevel, loop cut, knife, edge slide, and subdivide —
+        Extrude, Inset, Bevel, Loop Cut, Knife, Edge Slide, and Subdivide,
         the toolset you already know, rebuilt for direct manipulation.
       </p>
     </div>
     <div class="feature">
       <h3>Paint in 3D</h3>
       <p>
-        Paint colour directly onto your model with Apple Pencil, using
-        pressure and tilt. Roughness, metallic and emissive on the paid tier.
+        Paint colour directly onto your model with Apple Pencil, using pen
+        pressure. Add Roughness, Metallic and Emissive to make your models pop.
       </p>
     </div>
     <div class="feature">
       <h3>Take it anywhere</h3>
       <p>
-        Export to OBJ, glTF, GLB and USDZ — the last of which keeps your quads
-        and your materials together, so the next tool gets what you made.
+        Export to OBJ, glTF, GLB and USDZ. Meld seamlessly fits into your workflow.
       </p>
     </div>
   </section>
@@ -210,10 +375,85 @@
 <footer class="wrap">
   <div>© 2026 Meld Systems LLC</div>
   <div>
+    <a href="/about.html">About</a> ·
+    <a href="/contact.html">Contact</a> ·
     <a href="/privacy.html">Privacy</a> ·
-    <a href="/terms.html">Terms</a> ·
-    <a href="mailto:admin@meld3d.app">support@meld3d.app</a>
+    <a href="/terms.html">Terms</a>
   </div>
 </footer>
+<script>
+// Pop-out nav. No dependencies, no framework. Five links do not need one.
+(function () {
+  var btn  = document.getElementById('menuBtn');
+  var menu = document.getElementById('menu');
+
+  if (!btn || !menu) return;
+
+  function setOpen(open) {
+    menu.hidden = !open;
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+
+  btn.addEventListener('click', function (e) {
+    // Stopped so the document handler below does not immediately close it
+    // again on the same click.
+    e.stopPropagation();
+    setOpen(menu.hidden);
+  });
+
+  // Clicking inside the menu should not close it before the link resolves.
+  menu.addEventListener('click', function (e) { e.stopPropagation(); });
+
+  document.addEventListener('click', function () { setOpen(false); });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { setOpen(false); btn.focus(); }
+  });
+})();
+
+// Carousel arrows. The track is a native scroller, so these only nudge
+// scrollLeft by one tile and let scroll-snap land it.
+(function () {
+  var track = document.getElementById('gallery');
+  var prev  = document.getElementById('carPrev');
+  var next  = document.getElementById('carNext');
+
+  if (!track || !prev || !next) return;
+
+  function step() {
+    var first = track.querySelector('figure');
+    // Tile width plus the flex gap, so one press moves exactly one tile.
+    return first ? first.getBoundingClientRect().width + 16 : track.clientWidth;
+  }
+
+  function sync() {
+    // The track carries horizontal padding for focus-ring room, and
+    // scroll-snap-align:start lands the first tile with scrollLeft equal to
+    // that padding rather than 0. Comparing against 0 meant Prev never
+    // registered as being at the start. Read the padding rather than hard
+    // coding 4, so changing the CSS cannot desync this again.
+    var pad = parseFloat(getComputedStyle(track).paddingLeft) || 0;
+
+    // A couple of pixels of slack on both ends: scrollLeft can land
+    // fractionally short on a scaled display.
+    var max = track.scrollWidth - track.clientWidth - 2;
+
+    prev.disabled = track.scrollLeft <= pad + 2;
+    next.disabled = track.scrollLeft >= max;
+  }
+
+  prev.addEventListener('click', function () {
+    track.scrollBy({ left: -step(), behavior: 'smooth' });
+  });
+
+  next.addEventListener('click', function () {
+    track.scrollBy({ left: step(), behavior: 'smooth' });
+  });
+
+  track.addEventListener('scroll', sync, { passive: true });
+  window.addEventListener('resize', sync);
+  sync();
+})();
+</script>
 </body>
 </html>
